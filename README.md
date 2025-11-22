@@ -6,6 +6,14 @@ A collection of lightweight drivers and example projects for the NXP LPC1768 mic
 
 ```
 .
+├── LICENSE
+├── README.md
+├── docs/
+│   ├── connector_details.pdf
+│   ├── eval_user_manual.pdf
+│   ├── evalualtion_board.pdf
+│   ├── iot_board.pdf
+│   └── lpc1768_pinout.pdf
 ├── drivers/
 │   ├── adc0.c/.h
 │   ├── crystal.c/.h
@@ -23,8 +31,10 @@ A collection of lightweight drivers and example projects for the NXP LPC1768 mic
 │   ├── char_count.c
 │   ├── cloud_database.c
 │   └── ldr_intensity.c
-├── LICENSE
-└── README.md
+├── lib/
+│   └── start.lib
+└── to_be_tested/
+    └── dac_all.c
 ```
 
 ## Library
