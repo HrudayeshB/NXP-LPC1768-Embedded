@@ -1,6 +1,7 @@
 # NXP-LPC1768-Embedded
 
 A collection of lightweight drivers and example projects for the NXP LPC1768 microcontroller. This repository provides a simple, hardware-abstraction-layer (HAL)-style implementation for various peripherals, along with practical experiments demonstrating their use.
+Made possible with the support and shared code contributions of my college friends.
 
 ## Folder Structure
 
