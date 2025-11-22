@@ -1,2 +1,117 @@
 # NXP-LPC1768-Embedded
-A set of basic, lightweight drivers and example programs for the NXP LPC1768 microcontroller. The repository includes simple HAL-style implementations for core peripherals along with small test projects demonstrating their use.
+
+A collection of lightweight drivers and example projects for the NXP LPC1768 microcontroller. This repository provides a simple, hardware-abstraction-layer (HAL)-style implementation for various peripherals, along with practical experiments demonstrating their use.
+
+## Folder Structure
+
+```
+.
+├── drivers/
+│   ├── adc0.c/.h
+│   ├── crystal.c/.h
+│   ├── dht11.c/.h
+│   ├── extint.c/.h
+│   ├── keypad.c/.h
+│   ├── lcd_init.c/.h
+│   ├── pwm1.c/.h
+│   ├── relay.c/.h
+│   ├── sevenseg.c/.h
+│   ├── timer0.c/.h
+│   ├── uart0.c/.h
+│   └── uart2.c/.h
+├── experiments/
+│   ├── char_count.c
+│   ├── cloud_database.c
+│   └── ldr_intensity.c
+├── LICENSE
+└── README.md
+```
+
+## Library
+
+The `lib` folder contains essential startup files for the LPC1768, including `startup_LPC17xx.s` and `system_LPC17xx.c`. You can find the folder [here](./lib).
+
+## Drivers
+
+The `drivers` directory contains the core peripheral drivers. Each driver is self-contained and provides a simple interface for controlling the hardware.
+
+| Driver | Description |
+|---|---|
+| `adc0` | Driver for the Analog-to-Digital Converter (ADC) on channel 0. |
+| `crystal` | Driver for configuring the external crystal oscillator. |
+| `dht11` | Driver for the DHT11 temperature and humidity sensor. |
+| `extint` | Driver for configuring external interrupts. |
+| `keypad` | Driver for a standard 4x4 matrix keypad. |
+| `lcd_init` | Initialization and control functions for a character LCD. |
+| `pwm1` | Driver for Pulse-Width Modulation (PWM) on channel 1. |
+| `relay` | Driver for controlling a relay module. |
+| `sevenseg` | Driver for a 7-segment display. |
+| `timer0` | Driver for Timer0, providing delay functions. |
+| `uart0` | Driver for UART0 communication. |
+| `uart2` | Driver for UART2 communication. |
+
+## Experiments
+
+The `experiments` directory contains example projects that demonstrate how to use the drivers to perform specific tasks.
+
+| Experiment | Description |
+|---|---|
+| `char_count.c` | A character counter using a keypad for input, an LCD for display, and a 7-segment display to show the character count. |
+| `cloud_database.c` | An experiment to send sensor data to a cloud database. |
+| `ldr_intensity.c` | An experiment to measure light intensity using a Light Dependent Resistor (LDR). |
+
+## How to Use (Keil uVision)
+
+Before you begin, it is highly recommended to refer to the **[LPC1768 Datasheet](https://www.keil.com/dd/docs/datashts/philips/lpc17xx_um.pdf)**  and the **[LPC1768 Pinout Diagram](docs/lpc1768_pinout.pdf)**  to understand the microcontroller's capabilities and pin functions.
+Also check the `docs` folder for IOT board Pinout.
+
+1.  **Create a new project:**
+    *   Open Keil uVision and create a new project (`Project -> New uVision Project...`).
+    *   Select the `NXP LPC1768` device from the device database.
+    *   A dialog box will ask if you want to add the startup files. Click **No**.
+
+2.  **Add startup files:**
+    *   Right-click on the `Source Group 1` folder in the Project window and select `Add Existing Files to Group 'Source Group 1'...`.
+    *   Navigate to the `lib` directory of this repository and add the `start.lib` file.
+
+3.  **Add driver files to your project:**
+    *   Right-click on the `Source Group 1` folder in the Project window and select `Add Existing Files to Group 'Source Group 1'...`.
+    *   Navigate to the `drivers` directory of this repository and add the `.c` files for the peripherals you want to use.
+    *   You will also need to add the corresponding `.h` files to your project's include path. Go to `Project -> Options for Target 'Target 1'... -> C/C++` and add the `drivers` directory to the `Include Paths`.
+
+4.  **Write your application:**
+    *   Create a new `main.c` file or use one of the examples from the `experiments` directory.
+    *   Include the necessary driver header files in your `main.c` file (e.g., `#include "adc0.h"`).
+    *   Call the `_Init()` function for each peripheral you are using.
+    *   Use the driver functions to interact with the hardware.
+
+5.  **Configure build and debug options:**
+    *   Go to `Project -> Options for Target 'Target 1'...`.
+    *   In the **Output** tab, check the box for **Create HEX File**.
+    *   In the **Debug** tab, select your debugger (e.g., `J-LINK / J-TRACE Cortex`) from the dropdown menu.
+
+6.  **Build the project:**
+    *   Build your project in Keil uVision (`Project -> Build Target`). This will generate a `.hex` file in your project folder.
+
+7.  **Flash with FlashMagic:**
+    *   Open FlashMagic.
+    *   **Communications:**
+        *   Select the correct **COM Port** for your device. You can find this in the Windows Device Manager under "Ports (COM & LPT)".
+        *   Set the **Baud Rate**. A good starting point is `9600`. If you encounter issues, you may need to try different baud rates.
+        *   Select `LPC1768` as the device.
+    *   **Programming:**
+        *   Browse for and select the `.hex` file generated by Keil uVision.
+        *   Ensure the "Erase blocks used by Hex File" option is checked.
+    *   **Flashing:**
+        *   Put your LPC1768 board into bootloader mode (Press and hold ISP, then press and release RESET, then release ISP), it is automatic in Evaluation Board.
+        *   Click the **Start** button in FlashMagic to begin the flashing process.
+
+Each driver file contains a `USAGE` section at the bottom with a simple code example.
+
+## Contributing
+
+Contributions are welcome! If you have a driver or an experiment you'd like to add, please open a pull request.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
