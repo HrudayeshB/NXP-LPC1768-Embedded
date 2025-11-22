@@ -41,7 +41,7 @@ This work was made possible thanks to the shared contributions, code snippets, a
 
 ## Library
 
-The `lib` folder contains essential startup files for the LPC1768, including `startup_LPC17xx.s` and `system_LPC17xx.c`. You can find the folder [here](./lib).
+The `lib` folder contains `start.lib` which contains essential startup files for the LPC1768, including `startup_LPC17xx.s` and `system_LPC17xx.c`. You can find the folder [here](./lib).
 
 ## Drivers
 
