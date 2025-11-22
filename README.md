@@ -63,7 +63,7 @@ The `experiments` directory contains example projects that demonstrate how to us
 ## How to Use (Keil uVision)
 
 Before you begin, it is highly recommended to refer to the **[LPC1768 Datasheet](https://www.keil.com/dd/docs/datashts/philips/lpc17xx_um.pdf)**  and the **[LPC1768 Pinout Diagram](docs/lpc1768_pinout.pdf)**  to understand the microcontroller's capabilities and pin functions.
-Also check the `docs` folder for IOT board Pinout.
+Also check the `docs` folder for IOT board and Evaluation Board Pinout and User Manual.
 
 1.  **Create a new project:**
     *   Open Keil uVision and create a new project (`Project -> New uVision Project...`).
