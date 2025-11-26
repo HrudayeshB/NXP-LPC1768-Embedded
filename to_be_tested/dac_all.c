@@ -1,71 +1,96 @@
 #include <LPC17xx.h>
-#include <math.h>
 
 #define TABLE_SIZE 256
+#define PI 3.14159265358979
 
 uint16_t sine_table[TABLE_SIZE];
 uint16_t square_table[TABLE_SIZE];
 uint16_t tri_table[TABLE_SIZE];
 uint16_t ramp_table[TABLE_SIZE];
 
-//--------------------------------------------------
-// Build lookup tables (8-bit output for GPIO)
-//--------------------------------------------------
-void build_tables(void) {
-    for (int i = 0; i < TABLE_SIZE; i++) {
+/* --------------------------------------------------
+   Integer sine approximation (no math.h required)
+   Range: input 0..255 → output approx -32767..32767
+   Based on a fast parabolic approximation
+-------------------------------------------------- */
+static int16_t fast_sin(uint16_t x)
+{
+    /* map x (0..255) → angle -PI..PI */
+    float a = ((float)x * (2.0f * PI) / 256.0f) - PI;
 
-        // Convert sine (-1..1) → 0..255
-        sine_table[i] = (uint16_t)((sin(2 * M_PI * i / TABLE_SIZE) + 1.0) * 127);
+    /* parabolic sine approximation */
+    float b = (4.0f / PI) * a;
+    float c = -4.0f / (PI * PI) * a * (a < 0 ? -a : a);
+    return (int16_t)((b + c) * 32767.0f);
+}
 
-        // Square wave table
-        square_table[i] = (i < TABLE_SIZE/2) ? 255 : 0;
+/* --------------------------------------------------
+   Build lookup tables in old-style C
+-------------------------------------------------- */
+void build_tables()
+{
+    int i;
 
-        // triangle wave table 
-        if (i < TABLE_SIZE/2)
-            tri_table[i] = i * 2;
+    for (i = 0; i < TABLE_SIZE; i++) {
+
+        /* Convert approx-sine (-32767..32767) → 0..255 */
+        sine_table[i] = (uint16_t)(((fast_sin(i) + 32767) * 255U) / 65535U);
+
+        /* Square wave */
+        if (i < TABLE_SIZE / 2)
+            square_table[i] = 255;
         else
-            tri_table[i] = 255 - (i - TABLE_SIZE/2) * 2;
+            square_table[i] = 0;
 
-        // ramp wave table
-        ramp_table[i] = (uint16_t)(255.0 * i / TABLE_SIZE);
+        /* Triangle wave */
+        if (i < TABLE_SIZE / 2)
+            tri_table[i] = (uint16_t)(i * 2);
+        else
+            tri_table[i] = (uint16_t)(255 - (i - TABLE_SIZE / 2) * 2);
+
+        /* Ramp */
+        ramp_table[i] = (uint16_t)((255U * i) / TABLE_SIZE);
     }
 }
 
-//--------------------------------------------------
-// GPIO Init (P0.4–P0.11 output for R-2R DAC)
-//--------------------------------------------------
-void gpio_init(void) {
-    LPC_PINCON->PINSEL0 &= 0xFF0000FF;     // P0.4–P0.11 as GPIO
-    LPC_GPIO0->FIODIR  |= 0x00000FF0;      // Set P0.4–P0.11 as output
-    LPC_GPIO0->FIOMASK = ~0x00000FF0;      // Only touch these 8 bits
+/* --------------------------------------------------
+   Configure R-2R GPIO outputs
+-------------------------------------------------- */
+void gpio_init()
+{
+    LPC_PINCON->PINSEL0 &= 0xFF0000FF;      /* P0.4–P0.11 as GPIO */
+    LPC_GPIO0->FIODIR  |= 0x00000FF0;       /* outputs */
+    LPC_GPIO0->FIOMASK  = ~0x00000FF0;      /* only modify these bits */
 }
 
-//--------------------------------------------------
-int main(void) {
+/* -------------------------------------------------- */
+int main(void)
+{
+    uint16_t index;
+    uint16_t *wave;
 
     build_tables();
     gpio_init();
 
-    uint16_t index = 0;
+    /* choose waveform */
+    wave = sine_table;
+    /* wave = square_table; */
+    /* wave = tri_table; */
+    /* wave = ramp_table; */
 
-    // SELECT WAVEFORM HERE:
-    uint16_t *wave = sine_table;
-    //uint16_t *wave = square_table;
-    //uint16_t *wave = tri_table;
-    //uint16_t *wave = ramp_table;
+    index = 0;
 
     while (1) {
 
-        uint32_t v = wave[index] << 4;   // Move 8-bit sample to P0.4–11
+        /* shift 8-bit sample to P0.4–P0.11 */
+        LPC_GPIO0->FIOPIN = (uint32_t)(wave[index] << 4);
 
-        LPC_GPIO0->FIOPIN = v;           // Output to GPIO pins (R-2R ladder)
-
-        // ----------- DAC LINE COMMENTED OUT ---------------
-        // LPC_DAC->DACR = wave[index] << 6; // AOUT -> P0.26 
-        // --------------------------------------------------
+        /* Optional: internal DAC
+        LPC_DAC->DACR = wave[index] << 6;
+        */
 
         index++;
-        if (index >= TABLE_SIZE) index = 0;
+        if (index >= TABLE_SIZE)
+            index = 0;
     }
 }
-
